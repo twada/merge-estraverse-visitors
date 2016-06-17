@@ -49,6 +49,7 @@ var mergeVisitors = function () {
         },
         leave: function (currentNode, parentNode) {
             var controller = this;
+            var replacements = [];
             leaves.forEach(function (subVisitor) {
                 if (subVisitor.isSkipping(controller)) {
                     return;
@@ -58,8 +59,16 @@ var mergeVisitors = function () {
                 switch (ret) {
                 case estraverse.VisitorOption.Skip:
                     // subVisitor.startSkipping(controller);  // meaningless
+                    return;
+                }
+                if (typeof ret === 'object' && ret !== null && typeof ret.type === 'string') {
+                    replacements.push(ret);
                 }
             });
+            if (replacements.length === 1) {
+                return replacements[0];
+            }
+            return undefined;
         }
     };
 };
