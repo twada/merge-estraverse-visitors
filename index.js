@@ -6,7 +6,14 @@ var slice = Array.prototype.slice;
 
 function SubVisitor () {
     this.skipStartNode = null;
+    this.broken = false;
 }
+SubVisitor.prototype.isBroken = function () {
+    return !!this.broken;
+};
+SubVisitor.prototype.markBroken = function () {
+    return this.broken = true;
+};
 SubVisitor.prototype.isSkipping = function (controller) {
     return this.skipStartNode && (this.skipStartNode !== controller.current());
 };
@@ -37,6 +44,9 @@ var mergeVisitors = function () {
         enter: function (currentNode, parentNode) {
             var controller = this;
             enters.forEach(function (subVisitor) {
+                if (subVisitor.isBroken()) {
+                    return;
+                }
                 if (subVisitor.isSkipping(controller)) {
                     return;
                 }
@@ -44,6 +54,10 @@ var mergeVisitors = function () {
                 switch (ret) {
                 case estraverse.VisitorOption.Skip:
                     subVisitor.startSkipping(controller);
+                    break;
+                case estraverse.VisitorOption.Break:
+                    subVisitor.markBroken();
+                    break;
                 }
             });
         },
@@ -51,6 +65,9 @@ var mergeVisitors = function () {
             var controller = this;
             var replacements = [];
             leaves.forEach(function (subVisitor) {
+                if (subVisitor.isBroken(controller)) {
+                    return;
+                }
                 if (subVisitor.isSkipping(controller)) {
                     return;
                 }
