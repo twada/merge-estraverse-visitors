@@ -77,6 +77,9 @@ var mergeVisitors = function () {
                 case estraverse.VisitorOption.Skip:
                     // subVisitor.startSkipping(controller);  // meaningless
                     return;
+                case estraverse.VisitorOption.Break:
+                    subVisitor.markBroken();
+                    return;
                 }
                 if (typeof ret === 'object' && ret !== null && typeof ret.type === 'string') {
                     replacements.push(ret);

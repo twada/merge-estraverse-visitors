@@ -147,6 +147,43 @@ describe('interrupt skip and break', function () {
             'v2: leaving FunctionDeclaration'
         ]);
     });
+    it('break one visitor on leave', function () {
+        var logs = [];
+        estraverse.traverse(acorn.parse(code), mergeVisitors(
+            {
+                enter: visitor('v1', 'entering', logs),
+                leave: function (currentNode, parentNode) {
+                    switch(currentNode.type) {
+                    case 'ForStatement':
+                        logs.push('v1: going to break from ' + currentNode.type + ' on leave');
+                        return estraverse.VisitorOption.Break;
+                    case 'CallExpression':
+                    case 'FunctionDeclaration':
+                        logs.push('v1: leaving ' + currentNode.type);
+                        break;
+                    }
+                    return undefined;
+                }
+            },
+            {
+                enter: visitor('v2', 'entering', logs),
+                leave: visitor('v2', 'leaving', logs)
+            }
+        ));
+        assert.deepEqual(logs, [
+            'v1: entering FunctionDeclaration',
+            'v2: entering FunctionDeclaration',
+            'v1: entering ForStatement',
+            'v2: entering ForStatement',
+            'v1: entering CallExpression',
+            'v2: entering CallExpression',
+            'v2: leaving CallExpression',
+            'v1: leaving CallExpression',
+            'v2: leaving ForStatement',
+            'v1: going to break from ForStatement on leave',
+            'v2: leaving FunctionDeclaration'
+        ]);
+    });
 });
 
 describe('on estraverse.replace', function () {
