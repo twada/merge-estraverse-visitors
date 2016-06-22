@@ -136,6 +136,61 @@ describe('estraverse learning', function () {
         });
     });
 
+    describe('Controller API', function () {
+        it('Controller#skip on enter', function () {
+            var logs = [];
+            estraverse.traverse(acorn.parse(code), {
+                enter: function (currentNode, parentNode) {
+                    switch(currentNode.type) {
+                    case 'ForStatement':
+                        logs.push('going to skip ForStatement');
+                        this.skip();
+                        break;
+                    case 'CallExpression':
+                    case 'FunctionDeclaration':
+                        logs.push('entering ' + currentNode.type);
+                        break;
+                    }
+                    return undefined;
+                },
+                leave: visitor('leaving', logs)
+            });
+            assert.deepEqual(logs, [
+                'entering FunctionDeclaration',
+                'going to skip ForStatement',
+                'leaving ForStatement',   // leave method is called with beginning-of-skip node
+                'going to skip ForStatement',
+                'leaving ForStatement',   // leave method is called with beginning-of-skip node
+                'leaving FunctionDeclaration'
+            ]);
+        });
+        it('Controller#break on leave', function () {
+            var logs = [];
+            estraverse.traverse(acorn.parse(code), {
+                enter: visitor('entering', logs),
+                leave: function (currentNode, parentNode) {
+                    switch(currentNode.type) {
+                    case 'ForStatement':
+                        logs.push('going to break from ForStatement on leave');
+                        this.break();
+                        break;
+                    case 'CallExpression':
+                    case 'FunctionDeclaration':
+                        logs.push('leaving ' + currentNode.type);
+                        break;
+                    }
+                    return undefined;
+                }
+            });
+            assert.deepEqual(logs, [
+                'entering FunctionDeclaration',
+                'entering ForStatement',
+                'entering CallExpression',
+                'leaving CallExpression',
+                'going to break from ForStatement on leave'
+            ]);
+        });
+    });
 
     describe('estraverse#replace', function () {
         var expectedCode = [
