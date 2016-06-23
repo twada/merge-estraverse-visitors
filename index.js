@@ -42,14 +42,24 @@ var mergeVisitors = function () {
     });
     return {
         enter: function (currentNode, parentNode) {
-            var controller = this;
+            var orig = this;
             enters.forEach(function (subVisitor) {
+                var controller = Object.create(orig);
                 if (subVisitor.isBroken()) {
                     return;
                 }
                 if (subVisitor.isSkipping(controller)) {
                     return;
                 }
+                controller.notify = function notify (flag) {
+                    switch (flag) {
+                    case estraverse.VisitorOption.Skip:
+                        subVisitor.startSkipping(controller);
+                        return;
+                    default:
+                        orig.notify.call(orig, flag);
+                    }
+                };
                 var ret = subVisitor.enter.call(controller, currentNode, parentNode);
                 switch (ret) {
                 case estraverse.VisitorOption.Skip:

@@ -77,7 +77,7 @@ describe('merge multiple visitors', function () {
 });
 
 describe('interrupt skip and break', function () {
-    it('skip per visitor', function () {
+    it('when one of visitors returns estraverse.VisitorOption.Skip on enter', function () {
         var logs = [];
         estraverse.traverse(acorn.parse(code), mergeVisitors(
             {
@@ -113,7 +113,44 @@ describe('interrupt skip and break', function () {
             'v1: leaving FunctionDeclaration'
         ]);
     });
-    it('break per visitor', function () {
+    it('when one of visitors calls Controller#skip on enter', function () {
+        var logs = [];
+        estraverse.traverse(acorn.parse(code), mergeVisitors(
+            {
+                enter: function (currentNode, parentNode) {
+                    switch(currentNode.type) {
+                    case 'ForStatement':
+                        logs.push('v1: going to skip ' + currentNode.type);
+                        this.skip();
+                        break;
+                    case 'CallExpression':
+                    case 'FunctionDeclaration':
+                        logs.push('v1: entering ' + currentNode.type);
+                        break;
+                    }
+                    return undefined;
+                },
+                leave: visitor('v1', 'leaving', logs)
+            },
+            {
+                enter: visitor('v2', 'entering', logs),
+                leave: visitor('v2', 'leaving', logs)
+            }
+        ));
+        assert.deepEqual(logs, [
+            'v1: entering FunctionDeclaration',
+            'v2: entering FunctionDeclaration',
+            'v1: going to skip ForStatement',
+            'v2: entering ForStatement',
+            'v2: entering CallExpression',
+            'v2: leaving CallExpression',
+            'v2: leaving ForStatement',
+            'v1: leaving ForStatement',
+            'v2: leaving FunctionDeclaration',
+            'v1: leaving FunctionDeclaration'
+        ]);
+    });
+    it('when one of visitors returns estraverse.VisitorOption.Break on enter', function () {
         var logs = [];
         estraverse.traverse(acorn.parse(code), mergeVisitors(
             {
@@ -147,7 +184,7 @@ describe('interrupt skip and break', function () {
             'v2: leaving FunctionDeclaration'
         ]);
     });
-    it('break one visitor on leave', function () {
+    it('when one of visitors returns estraverse.VisitorOption.Break on leave', function () {
         var logs = [];
         estraverse.traverse(acorn.parse(code), mergeVisitors(
             {
