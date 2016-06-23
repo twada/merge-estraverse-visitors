@@ -56,6 +56,9 @@ var mergeVisitors = function () {
                     case estraverse.VisitorOption.Skip:
                         subVisitor.startSkipping(controller);
                         return;
+                    case estraverse.VisitorOption.Break:
+                        subVisitor.markBroken();
+                        return;
                     default:
                         orig.notify.call(orig, flag);
                     }
