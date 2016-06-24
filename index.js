@@ -75,9 +75,10 @@ var mergeVisitors = function () {
             });
         },
         leave: function (currentNode, parentNode) {
-            var controller = this;
+            var orig = this;
             var replacements = [];
             leaves.forEach(function (subVisitor) {
+                var controller = Object.create(orig);
                 if (subVisitor.isBroken(controller)) {
                     return;
                 }
@@ -85,6 +86,18 @@ var mergeVisitors = function () {
                     return;
                 }
                 subVisitor.beforeLeave(controller);
+                controller.notify = function notify (flag) {
+                    switch (flag) {
+                    case estraverse.VisitorOption.Skip:
+                        // subVisitor.startSkipping(controller);  // meaningless
+                        return;
+                    case estraverse.VisitorOption.Break:
+                        subVisitor.markBroken();
+                        return;
+                    default:
+                        orig.notify.call(orig, flag);
+                    }
+                };
                 var ret = subVisitor.leave.call(controller, currentNode, parentNode);
                 switch (ret) {
                 case estraverse.VisitorOption.Skip:
