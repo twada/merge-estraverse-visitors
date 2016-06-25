@@ -30,7 +30,7 @@ function visitor (name, when, logs) {
 describe('merge multiple visitors', function () {
     it('visitors in order', function () {
         var logs = [];
-        estraverse.traverse(acorn.parse(code), mergeVisitors(
+        estraverse.traverse(acorn.parse(code), mergeVisitors([
             {
                 enter: visitor('v1', 'entering', logs),
                 leave: visitor('v1', 'leaving', logs)
@@ -39,7 +39,7 @@ describe('merge multiple visitors', function () {
                 enter: visitor('v2', 'entering', logs),
                 leave: visitor('v2', 'leaving', logs)
             }
-        ));
+        ]));
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',
             'v2: entering FunctionDeclaration',
@@ -57,14 +57,14 @@ describe('merge multiple visitors', function () {
     });
     it('enter only visitor, leave only visitor', function () {
         var logs = [];
-        estraverse.traverse(acorn.parse(code), mergeVisitors(
+        estraverse.traverse(acorn.parse(code), mergeVisitors([
             {
                 enter: visitor('v1', 'entering', logs)
             },
             {
                 leave: visitor('v2', 'leaving', logs)
             }
-        ));
+        ]));
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',
             'v1: entering ForStatement',
@@ -79,7 +79,7 @@ describe('merge multiple visitors', function () {
 describe('interrupt skip and break', function () {
     it('when one of visitors returns estraverse.VisitorOption.Skip on enter', function () {
         var logs = [];
-        estraverse.traverse(acorn.parse(code), mergeVisitors(
+        estraverse.traverse(acorn.parse(code), mergeVisitors([
             {
                 enter: function (currentNode, parentNode) {
                     switch(currentNode.type) {
@@ -99,7 +99,7 @@ describe('interrupt skip and break', function () {
                 enter: visitor('v2', 'entering', logs),
                 leave: visitor('v2', 'leaving', logs)
             }
-        ));
+        ]));
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',
             'v2: entering FunctionDeclaration',
@@ -115,7 +115,7 @@ describe('interrupt skip and break', function () {
     });
     it('when one of visitors calls Controller#skip on enter', function () {
         var logs = [];
-        estraverse.traverse(acorn.parse(code), mergeVisitors(
+        estraverse.traverse(acorn.parse(code), mergeVisitors([
             {
                 enter: function (currentNode, parentNode) {
                     switch(currentNode.type) {
@@ -136,7 +136,7 @@ describe('interrupt skip and break', function () {
                 enter: visitor('v2', 'entering', logs),
                 leave: visitor('v2', 'leaving', logs)
             }
-        ));
+        ]));
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',
             'v2: entering FunctionDeclaration',
@@ -152,7 +152,7 @@ describe('interrupt skip and break', function () {
     });
     it('when one of visitors returns estraverse.VisitorOption.Break on enter', function () {
         var logs = [];
-        estraverse.traverse(acorn.parse(code), mergeVisitors(
+        estraverse.traverse(acorn.parse(code), mergeVisitors([
             {
                 enter: function (currentNode, parentNode) {
                     switch(currentNode.type) {
@@ -172,7 +172,7 @@ describe('interrupt skip and break', function () {
                 enter: visitor('v2', 'entering', logs),
                 leave: visitor('v2', 'leaving', logs)
             }
-        ));
+        ]));
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',
             'v2: entering FunctionDeclaration',
@@ -186,7 +186,7 @@ describe('interrupt skip and break', function () {
     });
     it('when one of visitors calls Controller#break on enter', function () {
         var logs = [];
-        estraverse.traverse(acorn.parse(code), mergeVisitors(
+        estraverse.traverse(acorn.parse(code), mergeVisitors([
             {
                 enter: function (currentNode, parentNode) {
                     switch(currentNode.type) {
@@ -207,7 +207,7 @@ describe('interrupt skip and break', function () {
                 enter: visitor('v2', 'entering', logs),
                 leave: visitor('v2', 'leaving', logs)
             }
-        ));
+        ]));
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',
             'v2: entering FunctionDeclaration',
@@ -221,7 +221,7 @@ describe('interrupt skip and break', function () {
     });
     it('when one of visitors returns estraverse.VisitorOption.Break on leave', function () {
         var logs = [];
-        estraverse.traverse(acorn.parse(code), mergeVisitors(
+        estraverse.traverse(acorn.parse(code), mergeVisitors([
             {
                 enter: visitor('v1', 'entering', logs),
                 leave: function (currentNode, parentNode) {
@@ -241,7 +241,7 @@ describe('interrupt skip and break', function () {
                 enter: visitor('v2', 'entering', logs),
                 leave: visitor('v2', 'leaving', logs)
             }
-        ));
+        ]));
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',
             'v2: entering FunctionDeclaration',
@@ -258,7 +258,7 @@ describe('interrupt skip and break', function () {
     });
     it('when one of visitors calls Controller#break on leave', function () {
         var logs = [];
-        estraverse.traverse(acorn.parse(code), mergeVisitors(
+        estraverse.traverse(acorn.parse(code), mergeVisitors([
             {
                 enter: visitor('v1', 'entering', logs),
                 leave: function (currentNode, parentNode) {
@@ -279,7 +279,7 @@ describe('interrupt skip and break', function () {
                 enter: visitor('v2', 'entering', logs),
                 leave: visitor('v2', 'leaving', logs)
             }
-        ));
+        ]));
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',
             'v2: entering FunctionDeclaration',
@@ -308,7 +308,7 @@ describe('on estraverse.replace', function () {
     it('return replaced node from merged visitor', function () {
         var logs = [];
         var originalAst = espurify(acorn.parse(code));
-        var actualAst = estraverse.replace(espurify(originalAst), mergeVisitors(
+        var actualAst = estraverse.replace(espurify(originalAst), mergeVisitors([
             {
                 enter: visitor('v1', 'entering', logs),
                 leave: visitor('v1', 'leaving', logs)
@@ -337,7 +337,7 @@ describe('on estraverse.replace', function () {
                     return undefined;
                 }
             }
-        ));
+        ]));
 
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',
@@ -360,7 +360,7 @@ describe('on estraverse.replace', function () {
     it('mixture of skipping visitor and replacing visitor', function () {
         var logs = [];
         var originalAst = espurify(acorn.parse(code));
-        var actualAst = estraverse.replace(espurify(originalAst), mergeVisitors(
+        var actualAst = estraverse.replace(espurify(originalAst), mergeVisitors([
             {
                 enter: function (currentNode, parentNode) {
                     switch(currentNode.type) {
@@ -400,7 +400,7 @@ describe('on estraverse.replace', function () {
                     return undefined;
                 }
             }
-        ));
+        ]));
 
         assert.deepEqual(logs, [
             'v1: entering FunctionDeclaration',

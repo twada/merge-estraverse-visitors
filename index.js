@@ -1,7 +1,6 @@
 'use strict';
 
 var estraverse = require('estraverse');
-var slice = Array.prototype.slice;
 
 
 function SubVisitor () {
@@ -30,20 +29,31 @@ SubVisitor.prototype.beforeLeave = function (controller) {
 function noop () {
 }
 
-var mergeVisitors = function () {
+function createSubVisitors (visitors) {
     var enters = [];
     var leaves = [];
-    slice.apply(arguments).forEach(function (v) {
-        var subVisitor = new SubVisitor();
+    var subVisitor, i, v, len = visitors.length;
+    for(i = 0; i < len; i += 1) {
+        v = visitors[i];
+        subVisitor = new SubVisitor();
         subVisitor.enter = (typeof v.enter === 'function') ? v.enter : noop;
         subVisitor.leave = (typeof v.leave === 'function') ? v.leave : noop;
         enters.push(subVisitor);
         leaves.unshift(subVisitor);
-    });
+    }
+    return {
+        enters: enters,
+        leaves: leaves
+    };
+}
+
+
+var mergeVisitors = function (visitors) {
+    var subVisitors = createSubVisitors(visitors);
     return {
         enter: function (currentNode, parentNode) {
             var orig = this;
-            enters.forEach(function (subVisitor) {
+            subVisitors.enters.forEach(function (subVisitor) {
                 var controller = Object.create(orig);
                 if (subVisitor.isBroken()) {
                     return;
@@ -77,7 +87,7 @@ var mergeVisitors = function () {
         leave: function (currentNode, parentNode) {
             var orig = this;
             var replacements = [];
-            leaves.forEach(function (subVisitor) {
+            subVisitors.leaves.forEach(function (subVisitor) {
                 var controller = Object.create(orig);
                 if (subVisitor.isBroken(controller)) {
                     return;

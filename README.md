@@ -7,7 +7,7 @@ Merge multiple visitors for estraverse
 API
 ---------------------------------------
 
-`var mergedVisitor = mergeVisitors(visitor1, visitor2, ...)`
+`var mergedVisitor = mergeVisitors(arrayOfVisitors)`
 
 
 INSTALL
@@ -35,7 +35,7 @@ Merge multiple estraverse visitors into one then run against target AST.
 
 ```js
 var ast = acorn.parse(code);
-estraverse.traverse(ast, mergeVisitors(
+estraverse.traverse(ast, mergeVisitors([
     {
         enter: function (currentNode, parentNode) {
             switch(currentNode.type) {
@@ -79,7 +79,7 @@ estraverse.traverse(ast, mergeVisitors(
             }
         }
     }
-));
+]));
 ```
 
 Results in:
