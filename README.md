@@ -34,52 +34,57 @@ function tenTimes (cb) {
 Merge multiple estraverse visitors into one then run against target AST.
 
 ```js
-var ast = acorn.parse(code);
-estraverse.traverse(ast, mergeVisitors([
-    {
-        enter: function (currentNode, parentNode) {
-            switch(currentNode.type) {
-            case 'ForStatement':
-                console.log('v1: going to skip ' + currentNode.type);
-                return estraverse.VisitorOption.Skip;
-            case 'CallExpression':
-            case 'FunctionDeclaration':
-                console.log('v1: entering ' + currentNode.type);
-                break;
-            }
-            return undefined;
-        },
-        leave: function (currentNode, parentNode) {
-            switch(currentNode.type) {
-            case 'ForStatement':
-            case 'CallExpression':
-            case 'FunctionDeclaration':
-                console.log('v1: leaving ' + currentNode.type);
-                break;
-            }
+var visitor1 = {
+    enter: function (currentNode, parentNode) {
+        switch(currentNode.type) {
+        case 'ForStatement':
+            console.log('v1: going to skip ' + currentNode.type);
+            this.skip();
+            break;
+        case 'CallExpression':
+        case 'FunctionDeclaration':
+            console.log('v1: entering ' + currentNode.type);
+            break;
         }
+        return undefined;
     },
-    {
-        enter: function (currentNode, parentNode) {
-            switch(currentNode.type) {
-            case 'ForStatement':
-            case 'CallExpression':
-            case 'FunctionDeclaration':
-                console.log('v2: entering ' + currentNode.type);
-                break;
-            }
-        },
-        leave: function (currentNode, parentNode) {
-            switch(currentNode.type) {
-            case 'ForStatement':
-            case 'CallExpression':
-            case 'FunctionDeclaration':
-                console.log('v2: leaving ' + currentNode.type);
-                break;
-            }
+    leave: function (currentNode, parentNode) {
+        switch(currentNode.type) {
+        case 'ForStatement':
+        case 'CallExpression':
+        case 'FunctionDeclaration':
+            console.log('v1: leaving ' + currentNode.type);
+            break;
         }
     }
-]));
+};
+
+var visitor2 = {
+    enter: function (currentNode, parentNode) {
+        switch(currentNode.type) {
+        case 'ForStatement':
+        case 'CallExpression':
+        case 'FunctionDeclaration':
+            console.log('v2: entering ' + currentNode.type);
+            break;
+        }
+    },
+    leave: function (currentNode, parentNode) {
+        switch(currentNode.type) {
+        case 'ForStatement':
+        case 'CallExpression':
+        case 'FunctionDeclaration':
+            console.log('v2: leaving ' + currentNode.type);
+            break;
+        }
+    }
+};
+
+var mergeVisitors = require('merge-estraverse-visitors');
+var estraverse = require('estraverse');
+var acorn = require('acorn');
+var ast = acorn.parse(code);
+estraverse.traverse(ast, mergeVisitors([ visitor1, visitor2 ]));
 ```
 
 Results in:
