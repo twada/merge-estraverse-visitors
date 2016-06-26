@@ -1,6 +1,6 @@
 {
   "name": "merge-estraverse-visitors",
-  "description": "merge multiple estraverse visitors",
+  "description": "merge multiple estraverse visitors into one",
   "version": "0.0.1",
   "author": {
     "name": "Takuto Wada",

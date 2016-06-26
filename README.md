@@ -1,7 +1,7 @@
 merge-estraverse-visitors
 ================================
 
-Merge multiple visitors for estraverse
+Merge multiple visitors for estraverse into one
 
 
 API

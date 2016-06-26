@@ -1,3 +1,13 @@
+/**
+ * merge-estraverse-visitors
+ *   merge multiple estraverse visitors into one
+ * 
+ * https://github.com/twada/merge-estraverse-visitors
+ *
+ * Copyright (c) 2016 Takuto Wada
+ * Licensed under the MIT license.
+ *   https://twada.mit-license.org/
+ */
 'use strict';
 
 var estraverse = require('estraverse');
