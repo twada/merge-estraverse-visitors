@@ -29,7 +29,7 @@ SubVisitor.prototype.isSkipping = function (controller) {
 SubVisitor.prototype.startSkipping = function (controller) {
     this.skipStartNode = controller.current();
 };
-SubVisitor.prototype.beforeLeave = function (controller) {
+SubVisitor.prototype.finishSkippingIfLeavingFrom = function (controller) {
     if (this.skipStartNode === controller.current()) {
         this.skipStartNode = null;
     }
@@ -105,7 +105,7 @@ var mergeVisitors = function (visitors) {
                 if (subVisitor.isSkipping(controller)) {
                     return;
                 }
-                subVisitor.beforeLeave(controller);
+                subVisitor.finishSkippingIfLeavingFrom(controller);
                 controller.notify = function notify (flag) {
                     switch (flag) {
                     case estraverse.VisitorOption.Skip:
