@@ -99,7 +99,7 @@ var mergeVisitors = function (visitors) {
             var replacements = [];
             subVisitors.leaves.forEach(function (subVisitor) {
                 var controller = Object.create(orig);
-                if (subVisitor.isBroken(controller)) {
+                if (subVisitor.isBroken()) {
                     return;
                 }
                 if (subVisitor.isSkipping(controller)) {
