@@ -58,7 +58,7 @@ function createSubVisitors (visitors) {
 }
 
 
-var mergeVisitors = function (visitors) {
+module.exports = function mergeVisitors (visitors) {
     var subVisitors = createSubVisitors(visitors);
     return {
         enter: function (currentNode, parentNode) {
@@ -138,5 +138,3 @@ var mergeVisitors = function (visitors) {
         }
     };
 };
-
-module.exports = mergeVisitors;
