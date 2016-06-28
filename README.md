@@ -3,6 +3,10 @@ merge-estraverse-visitors
 
 Merge multiple visitors for estraverse into one
 
+[![Build Status][travis-image]][travis-url]
+[![NPM version][npm-image]][npm-url]
+[![License][license-image]][license-url]
+
 
 API
 ---------------------------------------
@@ -111,3 +115,13 @@ AUTHOR
 LICENSE
 ---------------------------------------
 Licensed under the [MIT](http://twada.mit-license.org/) license.
+
+
+[travis-url]: https://travis-ci.org/twada/merge-estraverse-visitors
+[travis-image]: https://secure.travis-ci.org/twada/merge-estraverse-visitors.svg?branch=master
+
+[npm-url]: https://npmjs.org/package/merge-estraverse-visitors
+[npm-image]: https://badge.fury.io/js/merge-estraverse-visitors.svg
+
+[license-url]: http://twada.mit-license.org/
+[license-image]: https://img.shields.io/badge/license-MIT-brightgreen.svg
