@@ -12,9 +12,9 @@
     "estraverse": "^4.0.0"
   },
   "devDependencies": {
-    "acorn": "^3.0.0",
+    "acorn": "^4.0.0",
     "espurify": "^1.6.0",
-    "mocha": "^2.4.5"
+    "mocha": "^3.0.0"
   },
   "files": [
     "CHANGELOG.md",
