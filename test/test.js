@@ -1,22 +1,21 @@
 'use strict';
 
 delete require.cache[require.resolve('..')];
-var mergeVisitors = require('..');
-var acorn = require('acorn');
-var estraverse = require('estraverse');
-var espurify = require('espurify');
-var assert = require('assert').strict;
-
-var code = [
-  'function tenTimes (cb) {',
-  '    for (var i = 0; i < 10; i += 1) {',
-  '        cb();',
-  '    }',
-  '}'
-].join('\n');
+const mergeVisitors = require('..');
+const { parse } = require('acorn');
+const estraverse = require('estraverse');
+const espurify = require('espurify');
+const assert = require('assert').strict;
+const code = `
+  function tenTimes (cb) {
+    for (var i = 0; i < 10; i += 1) {
+      cb();
+    }
+  }
+`;
 
 function visitor (name, when, logs) {
-  return function (currentNode, parentNode) {
+  return (currentNode, parentNode) => {
     switch (currentNode.type) {
       case 'ForStatement':
       case 'CallExpression':
@@ -27,10 +26,10 @@ function visitor (name, when, logs) {
   };
 }
 
-describe('merge multiple visitors', function () {
-  it('visitors in order', function () {
-    var logs = [];
-    estraverse.traverse(acorn.parse(code), mergeVisitors([
+describe('merge multiple visitors', () => {
+  it('visitors in order', () => {
+    const logs = [];
+    estraverse.traverse(parse(code), mergeVisitors([
       {
         enter: visitor('v1', 'entering', logs),
         leave: visitor('v1', 'leaving', logs)
@@ -55,9 +54,9 @@ describe('merge multiple visitors', function () {
       'v1: leaving FunctionDeclaration'
     ]);
   });
-  it('enter only visitor, leave only visitor', function () {
-    var logs = [];
-    estraverse.traverse(acorn.parse(code), mergeVisitors([
+  it('enter only visitor, leave only visitor', () => {
+    const logs = [];
+    estraverse.traverse(parse(code), mergeVisitors([
       {
         enter: visitor('v1', 'entering', logs)
       },
@@ -76,12 +75,12 @@ describe('merge multiple visitors', function () {
   });
 });
 
-describe('interrupt skip and break', function () {
-  it('when one of visitors returns estraverse.VisitorOption.Skip on enter', function () {
-    var logs = [];
-    estraverse.traverse(acorn.parse(code), mergeVisitors([
+describe('interrupt skip and break', () => {
+  it('when one of visitors returns estraverse.VisitorOption.Skip on enter', () => {
+    const logs = [];
+    estraverse.traverse(parse(code), mergeVisitors([
       {
-        enter: function (currentNode, parentNode) {
+        enter: (currentNode, parentNode) => {
           switch (currentNode.type) {
             case 'ForStatement':
               logs.push('v1: going to skip ' + currentNode.type);
@@ -113,9 +112,9 @@ describe('interrupt skip and break', function () {
       'v1: leaving FunctionDeclaration'
     ]);
   });
-  it('when one of visitors calls Controller#skip on enter', function () {
-    var logs = [];
-    estraverse.traverse(acorn.parse(code), mergeVisitors([
+  it('when one of visitors calls Controller#skip on enter', () => {
+    const logs = [];
+    estraverse.traverse(parse(code), mergeVisitors([
       {
         enter: function (currentNode, parentNode) {
           switch (currentNode.type) {
@@ -150,11 +149,11 @@ describe('interrupt skip and break', function () {
       'v1: leaving FunctionDeclaration'
     ]);
   });
-  it('when one of visitors returns estraverse.VisitorOption.Break on enter', function () {
-    var logs = [];
-    estraverse.traverse(acorn.parse(code), mergeVisitors([
+  it('when one of visitors returns estraverse.VisitorOption.Break on enter', () => {
+    const logs = [];
+    estraverse.traverse(parse(code), mergeVisitors([
       {
-        enter: function (currentNode, parentNode) {
+        enter: (currentNode, parentNode) => {
           switch (currentNode.type) {
             case 'ForStatement':
               logs.push('v1: going to break from ' + currentNode.type);
@@ -184,9 +183,9 @@ describe('interrupt skip and break', function () {
       'v2: leaving FunctionDeclaration'
     ]);
   });
-  it('when one of visitors calls Controller#break on enter', function () {
-    var logs = [];
-    estraverse.traverse(acorn.parse(code), mergeVisitors([
+  it('when one of visitors calls Controller#break on enter', () => {
+    const logs = [];
+    estraverse.traverse(parse(code), mergeVisitors([
       {
         enter: function (currentNode, parentNode) {
           switch (currentNode.type) {
@@ -219,12 +218,12 @@ describe('interrupt skip and break', function () {
       'v2: leaving FunctionDeclaration'
     ]);
   });
-  it('when one of visitors returns estraverse.VisitorOption.Break on leave', function () {
-    var logs = [];
-    estraverse.traverse(acorn.parse(code), mergeVisitors([
+  it('when one of visitors returns estraverse.VisitorOption.Break on leave', () => {
+    const logs = [];
+    estraverse.traverse(parse(code), mergeVisitors([
       {
         enter: visitor('v1', 'entering', logs),
-        leave: function (currentNode, parentNode) {
+        leave: (currentNode, parentNode) => {
           switch (currentNode.type) {
             case 'ForStatement':
               logs.push('v1: going to break from ' + currentNode.type + ' on leave');
@@ -256,9 +255,9 @@ describe('interrupt skip and break', function () {
       'v2: leaving FunctionDeclaration'
     ]);
   });
-  it('when one of visitors calls Controller#break on leave', function () {
-    var logs = [];
-    estraverse.traverse(acorn.parse(code), mergeVisitors([
+  it('when one of visitors calls Controller#break on leave', () => {
+    const logs = [];
+    estraverse.traverse(parse(code), mergeVisitors([
       {
         enter: visitor('v1', 'entering', logs),
         leave: function (currentNode, parentNode) {
@@ -296,26 +295,26 @@ describe('interrupt skip and break', function () {
   });
 });
 
-describe('on estraverse.replace', function () {
-  var expectedCode = [
-    'function tenTimes (cb) {',
-    '    for (var i = 0; i < 10; i += 1) {',
-    '        wrap(cb());',
-    '    }',
-    '}'
-  ].join('\n');
+describe('on estraverse.replace', () => {
+  const expectedCode = `
+    function tenTimes (cb) {
+      for (var i = 0; i < 10; i += 1) {
+        wrap(cb());
+      }
+    }
+`;
 
-  it('return replaced node from merged visitor', function () {
-    var logs = [];
-    var originalAst = espurify(acorn.parse(code));
-    var actualAst = estraverse.replace(espurify(originalAst), mergeVisitors([
+  it('return replaced node from merged visitor', () => {
+    const logs = [];
+    const originalAst = espurify(parse(code));
+    const actualAst = estraverse.replace(espurify(originalAst), mergeVisitors([
       {
         enter: visitor('v1', 'entering', logs),
         leave: visitor('v1', 'leaving', logs)
       },
       {
         enter: visitor('v2', 'entering', logs),
-        leave: function (currentNode, parentNode) {
+        leave: (currentNode, parentNode) => {
           switch (currentNode.type) {
             case 'ForStatement':
             case 'FunctionDeclaration':
@@ -354,15 +353,15 @@ describe('on estraverse.replace', function () {
       'v1: leaving FunctionDeclaration'
     ]);
 
-    assert.deepEqual(actualAst, espurify(acorn.parse(expectedCode)));
+    assert.deepEqual(actualAst, espurify(parse(expectedCode)));
   });
 
-  it('mixture of skipping visitor and replacing visitor', function () {
-    var logs = [];
-    var originalAst = espurify(acorn.parse(code));
-    var actualAst = estraverse.replace(espurify(originalAst), mergeVisitors([
+  it('mixture of skipping visitor and replacing visitor', () => {
+    const logs = [];
+    const originalAst = espurify(parse(code));
+    const actualAst = estraverse.replace(espurify(originalAst), mergeVisitors([
       {
-        enter: function (currentNode, parentNode) {
+        enter: (currentNode, parentNode) => {
           switch (currentNode.type) {
             case 'ForStatement':
               logs.push('v1: going to skip ' + currentNode.type);
@@ -378,7 +377,7 @@ describe('on estraverse.replace', function () {
       },
       {
         enter: visitor('v2', 'entering', logs),
-        leave: function (currentNode, parentNode) {
+        leave: (currentNode, parentNode) => {
           switch (currentNode.type) {
             case 'ForStatement':
             case 'FunctionDeclaration':
@@ -415,6 +414,6 @@ describe('on estraverse.replace', function () {
       'v1: leaving FunctionDeclaration'
     ]);
 
-    assert.deepEqual(actualAst, espurify(acorn.parse(expectedCode)));
+    assert.deepEqual(actualAst, espurify(parse(expectedCode)));
   });
 });
