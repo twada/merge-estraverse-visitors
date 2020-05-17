@@ -9,7 +9,7 @@
   },
   "bugs": "https://github.com/twada/merge-estraverse-visitors/issues",
   "dependencies": {
-    "estraverse": "^4.0.0"
+    "estraverse": "^5.0.0"
   },
   "devDependencies": {
     "acorn": "^7.1.1",
