@@ -11,7 +11,7 @@ Merge multiple visitors for estraverse into one
 API
 ---------------------------------------
 
-`var mergedVisitor = mergeVisitors(arrayOfVisitors)`
+`const mergedVisitor = mergeVisitors(arrayOfVisitors)`
 
 
 INSTALL
@@ -29,66 +29,67 @@ For given code,
 
 ```js
 function tenTimes (cb) {
-    for (var i = 0; i < 10; i += 1) {
-        cb();
-    }
+  for (var i = 0; i < 10; i += 1) {
+    cb();
+  }
 }
 ```
 
 Merge multiple estraverse visitors into one then run against target AST.
 
 ```js
-var visitor1 = {
-    enter: function (currentNode, parentNode) {
-        switch(currentNode.type) {
-        case 'ForStatement':
-            console.log('v1: going to skip ' + currentNode.type);
-            this.skip();
-            break;
-        case 'CallExpression':
-        case 'FunctionDeclaration':
-            console.log('v1: entering ' + currentNode.type);
-            break;
-        }
-        return undefined;
-    },
-    leave: function (currentNode, parentNode) {
-        switch(currentNode.type) {
-        case 'ForStatement':
-        case 'CallExpression':
-        case 'FunctionDeclaration':
-            console.log('v1: leaving ' + currentNode.type);
-            break;
-        }
+const visitor1 = {
+  enter: function (currentNode, parentNode) {
+    switch(currentNode.type) {
+    case 'ForStatement':
+      console.log('v1: going to skip ' + currentNode.type);
+      this.skip();
+      break;
+    case 'CallExpression':
+    case 'FunctionDeclaration':
+      console.log('v1: entering ' + currentNode.type);
+      break;
     }
+    return undefined;
+  },
+  leave: function (currentNode, parentNode) {
+    switch(currentNode.type) {
+    case 'ForStatement':
+    case 'CallExpression':
+    case 'FunctionDeclaration':
+      console.log('v1: leaving ' + currentNode.type);
+      break;
+    }
+  }
 };
 
-var visitor2 = {
-    enter: function (currentNode, parentNode) {
-        switch(currentNode.type) {
-        case 'ForStatement':
-        case 'CallExpression':
-        case 'FunctionDeclaration':
-            console.log('v2: entering ' + currentNode.type);
-            break;
-        }
-    },
-    leave: function (currentNode, parentNode) {
-        switch(currentNode.type) {
-        case 'ForStatement':
-        case 'CallExpression':
-        case 'FunctionDeclaration':
-            console.log('v2: leaving ' + currentNode.type);
-            break;
-        }
+const visitor2 = {
+  enter: function (currentNode, parentNode) {
+    switch(currentNode.type) {
+    case 'ForStatement':
+    case 'CallExpression':
+    case 'FunctionDeclaration':
+      console.log('v2: entering ' + currentNode.type);
+      break;
     }
+  },
+  leave: function (currentNode, parentNode) {
+    switch(currentNode.type) {
+    case 'ForStatement':
+    case 'CallExpression':
+    case 'FunctionDeclaration':
+      console.log('v2: leaving ' + currentNode.type);
+      break;
+    }
+  }
 };
 
-var mergeVisitors = require('merge-estraverse-visitors');
-var estraverse = require('estraverse');
-var acorn = require('acorn');
-var ast = acorn.parse(code);
-estraverse.traverse(ast, mergeVisitors([ visitor1, visitor2 ]));
+const mergeVisitors = require('merge-estraverse-visitors');
+const estraverse = require('estraverse');
+const { parse } = require('acorn');
+const ast = parse(code);
+const mergedVisitor = mergeVisitors([ visitor1, visitor2 ])
+estraverse.traverse(ast, mergedVisitor);
 ```
 
 Results in:
