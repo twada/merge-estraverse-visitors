@@ -114,6 +114,12 @@ AUTHOR
 * [Takuto Wada](https://github.com/twada)
 
 
+SUPPORT POLICY
+---------------------------------------
+
+Supports Node under maintenance. In other words, we stop supporting old Node versions when [their maintenance ends](https://github.com/nodejs/Release). Any other environments are not supported officially (means that we do not test against them on CI service).
+
+
 LICENSE
 ---------------------------------------
 Licensed under the [MIT](http://twada.mit-license.org/) license.
