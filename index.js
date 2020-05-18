@@ -4,9 +4,9 @@
  *
  * https://github.com/twada/merge-estraverse-visitors
  *
- * Copyright (c) 2016 Takuto Wada
+ * Copyright (c) 2016-2020 Takuto Wada
  * Licensed under the MIT license.
- *   https://twada.mit-license.org/
+ *   https://twada.mit-license.org/2016-2020
  */
 'use strict';
 

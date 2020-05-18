@@ -122,7 +122,7 @@ Supports Node under maintenance. In other words, we stop supporting old Node ver
 
 LICENSE
 ---------------------------------------
-Licensed under the [MIT](http://twada.mit-license.org/) license.
+Licensed under the [MIT](http://twada.mit-license.org/2016-2020) license.
 
 
 [travis-url]: https://travis-ci.org/twada/merge-estraverse-visitors
@@ -131,7 +131,7 @@ Licensed under the [MIT](http://twada.mit-license.org/) license.
 [npm-url]: https://npmjs.org/package/merge-estraverse-visitors
 [npm-image]: https://badge.fury.io/js/merge-estraverse-visitors.svg
 
-[license-url]: http://twada.mit-license.org/
+[license-url]: http://twada.mit-license.org/2016-2020
 [license-image]: https://img.shields.io/badge/license-MIT-brightgreen.svg
 
 [style-url]: https://github.com/Flet/semistandard
